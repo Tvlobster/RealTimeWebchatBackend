@@ -3,11 +3,14 @@ const express = require("express");
 const mongoose = require("mongoose");
 const session = require("express-session");
 const MongoStore = require("connect-mongo");
+const userRouters = require('./Routers/UserRoutes')
+
 
 const app = express();
 app.use(express.json());
 
-const port = process.env.PORT;
+const port = process.env.PORT || 4000;
+
 
 //DB connection
 const url = process.env.MONGO_URL;
@@ -22,16 +25,19 @@ async function connect() {
 
 connect();
 
+// session info
 app.use(session({
-    secret: process.env.SESSION_KEY,
-    resave: false,
-    saveUninitialized: false,
-    store: MongoStore.create({
-        mongoUrl: url
-    })
-}))
+  secret: process.env.SESSION_KEY || 'defaultSecretKey',  // Use a default key if SESSION_KEY is not set
+  resave: false,
+  saveUninitialized: false,
+  store: MongoStore.create({
+      mongoUrl: url
+  })
+}));
 
 
-server.listen(process.env.PORT || 4000, () => {
-    console.log(`Listening on port ${process.env.PORT || 4000}`);
+app.listen(port, () => {
+  console.log(`Listening on port ${port}`);
 });
+
+app.use(userRouters)
