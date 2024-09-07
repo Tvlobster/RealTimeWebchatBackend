@@ -45,12 +45,39 @@ router.post('/login',async (req,res)=>{
 })
 
 
-router.get('/find/allUsers',authenticatedUser, async (req,res) =>{
+router.get('/find/allUsers',authenticateUser, async (req,res) =>{
     console.log("User Connected to /find/allUsers")
     let users = await User.find({}).exec();
+    users.forEach((item)=>{
+        item.password = ""
+    })
     res.send({users:users})
 
 });
+
+
+
+async function authenticateUser(req,res,next){
+    console.log(req.session)
+    //pulls the session info from the cookie
+    //and checks to see if that user is in the db.
+    if(!req.session.user_id){
+        console.log("Unauthorized user")
+        return res.send({error:"Unauthroized user"})
+    }
+    else{
+        try {
+            const user = await User.findById(req.session.user_id)
+            req.user = user
+            next()
+        }
+        catch(e){
+            res.send(e)
+        }
+        
+    }
+}
+
 
 
 module.exports = router;
