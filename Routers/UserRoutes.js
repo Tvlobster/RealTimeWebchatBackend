@@ -1,4 +1,5 @@
 const express = require("express");
+const bcrypt = require("bcrypt")
 const User = require("../Models/User");
 
 
@@ -41,10 +42,15 @@ router.post('/login',async (req,res)=>{
         }
     
     }
-
-
-
 })
+
+
+router.get('/find/allUsers',authenticatedUser, async (req,res) =>{
+    console.log("User Connected to /find/allUsers")
+    let users = await User.find({}).exec();
+    res.send({users:users})
+
+});
 
 
 module.exports = router;
